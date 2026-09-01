@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String      @id @default(cuid())
+  name         String?
+  email        String      @unique
+  passwordHash String
+  avatarUrl    String?
+  timezone     String      @default("UTC")
+  theme        String      @default("system")
+  whatsappNumber        String?
+  whatsappVerified      Boolean                @default(false)
+  whatsappNotifications Boolean                @default(true)
+  whatsappDailyDigest   Boolean                @default(true)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  notes                 Note[]
+  categories            Category[]
+  tags                  Tag[]
+  reminders             Reminder[]
+  tasks                 Task[]
+  goals                 Goal[]
+  projects              Project[]
+  whatsappVerifications WhatsAppVerification[]
+
+  @@index([whatsappNumber])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  color     String?  @default("#6366f1")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes     Note[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name])
+}
+
+model Tag {
+  id        String    @id @default(cuid())
+  name      String
+  color     String?   @default("#8b5cf6")
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes     NoteTag[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, name])
+}
+
+model Note {
+  id         String    @id @default(cuid())
+  title      String
+  content    String?
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  projectId  String?
+  project    Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  isPinned   Boolean   @default(false)
+  isArchived Boolean   @default(false)
+  isFavorite Boolean   @default(false)
+  color      String    @default("default")
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags       NoteTag[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId, updatedAt])
+  @@index([userId, isPinned])
+  @@index([userId, isArchived])
+  @@index([userId, projectId])
+}
+
+model NoteTag {
+  noteId    String
+  tagId     String
+  note      Note     @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([noteId, tagId])
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  title       String
+  dueDate     DateTime
+  priority    String   @default("Normal")
+  isCompleted Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, dueDate])
+  @@index([userId, isCompleted])
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  dueDate     DateTime?
+  dueTime     String?
+  priority    String    @default("Medium") // Low, Medium, High, Urgent
+  status      String    @default("Inbox") // Inbox, Todo, InProgress, Completed, Cancelled
+  repeatRule  String?
+  goalId      String?
+  goal        Goal?     @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  projectId   String?
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  completedAt DateTime?
+  isNotified  Boolean   @default(false)
+  notifiedAt  DateTime?
+  remindAt    DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, dueDate])
+  @@index([userId, status])
+  @@index([userId, isNotified])
+  @@index([userId, updatedAt])
+  @@index([userId, goalId])
+  @@index([userId, projectId])
+}
+
+model Goal {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  category    String?     @default("General")
+  type        String      @default("Short-term") // Short-term, Long-term, Habit, Financial, Career, Learning, Personal
+  startDate   DateTime?   @default(now())
+  targetDate  DateTime?
+  priority    String      @default("Medium") // Low, Medium, High, Urgent
+  status      String      @default("Active") // Active, InProgress, Completed, Paused, Cancelled
+  progress    Float       @default(0) // 0 to 100
+  color       String?     @default("#6366f1")
+  milestones  Milestone[]
+  tasks       Task[]
+  projects    Project[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, targetDate])
+}
+
+model Milestone {
+  id          String    @id @default(cuid())
+  goalId      String
+  goal        Goal      @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  targetDate  DateTime?
+  isCompleted Boolean   @default(false)
+  completedAt DateTime?
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([goalId, order])
+  @@index([goalId, isCompleted])
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goalId      String?
+  goal        Goal?     @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  name        String
+  description String?
+  status      String    @default("Active") // Active, InProgress, Completed, Paused, Cancelled, Archived
+  tasks       Task[]
+  notes       Note[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, goalId])
+  @@index([userId, updatedAt])
+}
+
+model WhatsAppVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String
+  code      String
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, phone])
+  @@index([phone, code])
+}
