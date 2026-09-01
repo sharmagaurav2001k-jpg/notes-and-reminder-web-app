@@ -11,6 +11,7 @@ import {
   Bell,
   Star,
   Archive,
+  BarChart3,
   Settings,
   Plus,
   Sparkles,
@@ -54,6 +55,12 @@ const NAV_ITEMS = [
     href: "/favorites",
     icon: Star,
     badge: null,
+  },
+  {
+    label: "Analytics",
+    href: "/analytics",
+    icon: BarChart3,
+    badge: "New",
   },
   {
     label: "Archive",
