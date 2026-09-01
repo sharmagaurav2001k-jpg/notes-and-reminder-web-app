@@ -4,18 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateTaskSchema, formatZodError } from "@/lib/validations";
 import { calculateNextDueDate } from "@/lib/recurrence";
-
-async function getAuthenticatedUserId(session: any) {
-  if (session?.user?.id) return session.user.id;
-  if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email.toLowerCase().trim() },
-      select: { id: true },
-    });
-    return user?.id || null;
-  }
-  return null;
-}
+import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // GET /api/tasks/[id]
 export async function GET(
