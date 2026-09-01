@@ -43,11 +43,15 @@ interface AnalyticsData {
   };
 }
 
-function SkeletonCard({ className = "" }: { className?: string }) {
+function SkeletonCard({ className = "" }: { className?: string; children?: React.ReactNode }) {
   return (
     <div className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm animate-pulse ${className}`}>
-      <div className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-800 mb-4" />
-      <div className="h-40 rounded-xl bg-slate-100 dark:bg-slate-800" />
+      {children || (
+        <>
+          <div className="h-4 w-32 rounded bg-slate-200 dark:bg-slate-800 mb-4" />
+          <div className="h-40 rounded-xl bg-slate-100 dark:bg-slate-800" />
+        </>
+      )}
     </div>
   );
 }

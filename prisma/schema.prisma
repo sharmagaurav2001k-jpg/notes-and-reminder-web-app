@@ -30,6 +30,8 @@ model User {
   goals                 Goal[]
   projects              Project[]
   whatsappVerifications WhatsAppVerification[]
+  productivityScores    ProductivityScore[]
+  weeklyReviews         WeeklyReview[]
 
   @@index([whatsappNumber])
 }
@@ -211,4 +213,49 @@ model WhatsAppVerification {
 
   @@index([userId, phone])
   @@index([phone, code])
+}
+
+model ProductivityScore {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date           DateTime
+  score          Float    @default(0)
+  taskScore      Float    @default(0)
+  goalScore      Float    @default(0)
+  noteScore      Float    @default(0)
+  streakDays     Int      @default(0)
+  tasksCompleted Int      @default(0)
+  tasksTotal     Int      @default(0)
+  goalsProgressed Int     @default(0)
+  notesCreated   Int      @default(0)
+  focusMinutes   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, date], map: "user_date")
+  @@index([userId, date])
+}
+
+model WeeklyReview {
+  id                   String   @id @default(cuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStartDate        DateTime
+  weekEndDate          DateTime
+  totalTasks           Int      @default(0)
+  completedTasks       Int      @default(0)
+  tasksCompletedByDay  Json? // [{"day":"Mon","count":3},...]
+  notesCreated         Int      @default(0)
+  goalsProgressed      Int      @default(0)
+  goalsCompleted       Int      @default(0)
+  avgProductivityScore Float    @default(0)
+  topCategories        Json? // [{"name":"Work","count":5},...]
+  topTags              Json? // [{"name":"urgent","count":8},...]
+  highlights           String?
+  summary              String?
+  createdAt            DateTime @default(now())
+
+  @@unique([userId, weekStartDate])
+  @@index([userId, weekStartDate])
 }
