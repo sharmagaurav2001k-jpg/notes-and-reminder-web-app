@@ -16,6 +16,7 @@ import {
   X,
   Sparkles,
   Archive,
+  BarChart3,
   LogOut,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { label: "Goals & Vision", href: "/goals", icon: Target },
   { label: "Reminders", href: "/reminders", icon: Bell },
   { label: "Favorites", href: "/favorites", icon: Star },
+  { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Archive", href: "/archive", icon: Archive },
   { label: "Settings", href: "/settings", icon: Settings },
 ];

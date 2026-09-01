@@ -36,7 +36,9 @@ function ForgotPasswordForm() {
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       setIsLoading(true);
-      // Simulate reset email trigger
+      // TODO: Connect to a real password reset backend (e.g., NextAuth email provider, SendGrid, Resend)
+      // Currently this is a UI-only stub — no actual reset email is sent.
+      // See: https://next-auth.js.org/configuration/providers/email
       await new Promise((resolve) => setTimeout(resolve, 800));
       setSubmittedEmail(data.email);
       setIsSubmitted(true);

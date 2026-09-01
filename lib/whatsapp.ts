@@ -107,12 +107,11 @@ export async function sendWhatsAppTextMessage({
   text,
   previewUrl = false,
 }: WhatsAppTextMessagePayload): Promise<WhatsAppApiResponse> {
-  const formattedTo = formatWhatsAppNumber(to);
-
+  // Caller should format the number before passing; do NOT double-format here
   const payload = {
     messaging_product: "whatsapp",
     recipient_type: "individual",
-    to: formattedTo,
+    to,
     type: "text",
     text: {
       preview_url: previewUrl,
@@ -133,11 +132,11 @@ export async function sendWhatsAppTemplateMessage({
   languageCode = "en_US",
   components = [],
 }: WhatsAppTemplateMessagePayload): Promise<WhatsAppApiResponse> {
-  const formattedTo = formatWhatsAppNumber(to);
+  // Caller should format the number before passing; do NOT double-format here
 
   const payload = {
     messaging_product: "whatsapp",
-    to: formattedTo,
+    to,
     type: "template",
     template: {
       name: templateName,

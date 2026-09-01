@@ -3,18 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createNoteSchema, formatZodError } from "@/lib/validations";
-
-async function getAuthenticatedUserId(session: any) {
-  if (session?.user?.id) return session.user.id;
-  if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email.toLowerCase().trim() },
-      select: { id: true },
-    });
-    return user?.id || null;
-  }
-  return null;
-}
+import { createNote } from "@/lib/services/notes.service";
+import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // GET /api/notes
 export async function GET(req: Request) {
@@ -126,8 +116,6 @@ export async function GET(req: Request) {
     );
   }
 }
-
-import { createNote } from "@/lib/services/notes.service";
 
 // POST /api/notes
 export async function POST(req: Request) {

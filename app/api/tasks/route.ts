@@ -4,18 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createTaskSchema, formatZodError } from "@/lib/validations";
 import { Prisma } from "@prisma/client";
-
-async function getAuthenticatedUserId(session: any) {
-  if (session?.user?.id) return session.user.id;
-  if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email.toLowerCase().trim() },
-      select: { id: true },
-    });
-    return user?.id || null;
-  }
-  return null;
-}
+import { createTask } from "@/lib/services/tasks.service";
+import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // GET /api/tasks (list with status, priority, search, date, goal, and project filters)
 export async function GET(req: Request) {
@@ -103,8 +93,6 @@ export async function GET(req: Request) {
     );
   }
 }
-
-import { createTask } from "@/lib/services/tasks.service";
 
 // POST /api/tasks (create a new task)
 export async function POST(req: Request) {

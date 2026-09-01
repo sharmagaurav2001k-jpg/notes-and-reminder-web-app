@@ -2,18 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-
-async function getAuthenticatedUserId(session: any) {
-  if (session?.user?.id) return session.user.id;
-  if (session?.user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email.toLowerCase().trim() },
-      select: { id: true },
-    });
-    return user?.id || null;
-  }
-  return null;
-}
+import { getAuthenticatedUserId } from "@/lib/auth-helpers";
 
 // GET /api/tasks/upcoming (next 7 days, date-grouped)
 export async function GET(req: Request) {
