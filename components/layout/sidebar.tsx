@@ -12,6 +12,7 @@ import {
   Star,
   Archive,
   BarChart3,
+  Database,
   Settings,
   Plus,
   Sparkles,
@@ -60,6 +61,12 @@ const NAV_ITEMS = [
     label: "Analytics",
     href: "/analytics",
     icon: BarChart3,
+    badge: null,
+  },
+  {
+    label: "Analytics Lab",
+    href: "/analytics-lab",
+    icon: Database,
     badge: "New",
   },
   {
