@@ -1,0 +1,44 @@
+# A string used to distinguish different Supabase projects on the same host. Defaults to the
+# working directory name when running `supabase init`.
+project_id = "notes-and-reminder-web-app"
+
+[api]
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public"]
+
+[db]
+port = 54322
+
+[studio]
+port = 54323
+
+[inbucket]
+port = 54324
+
+[storage]
+file_size_limit = "10MB"
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/api/auth/callback"]
+jwt_expiry = 3600
+enable_signup = true
+email_double_confirm_changes = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[auth.external.google]
+enabled = false
+client_id = ""
+secret = ""
+redirect_uri = "http://localhost:3000/api/auth/callback/google"
+
+[auth.external.github]
+enabled = false
+client_id = ""
+secret = ""
+redirect_uri = "http://localhost:3000/api/auth/callback/github"

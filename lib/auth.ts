@@ -1,6 +1,9 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 import bcrypt from "bcryptjs";
+import { randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -8,6 +11,37 @@ const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 });
+
+/**
+ * Find or create a user from an OAuth provider (Google/GitHub).
+ * If the user's email already exists, return that user.
+ * If not, create a new user with a random password hash.
+ */
+async function findOrCreateOAuthUser(
+  email: string,
+  name: string,
+  avatarUrl: string | null,
+): Promise<string> {
+  const normalizedEmail = email.toLowerCase().trim();
+
+  const existing = await prisma.user.findUnique({
+    where: { email: normalizedEmail },
+    select: { id: true },
+  });
+
+  if (existing) return existing.id;
+
+  // Create new user with random password (they'll use OAuth to log in)
+  const randomPassword = randomBytes(32).toString("hex");
+  const passwordHash = await bcrypt.hash(randomPassword, 12);
+
+  const newUser = await prisma.user.create({
+    data: { email: normalizedEmail, name, avatarUrl, passwordHash },
+    select: { id: true },
+  });
+
+  return newUser.id;
+}
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -20,11 +54,12 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
+    // Existing credentials provider (email/password)
     CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email", placeholder: "you@example.com" },
-        password: { label: "Password", type: "password" },
+        password: { label: ".password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -59,6 +94,56 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+
+    // Google OAuth — enabled when GOOGLE_CLIENT_ID & SECRET are set
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            async profile(profile) {
+              const userId = await findOrCreateOAuthUser(
+                profile.email!,
+                profile.name ?? profile.email!.split("@")[0],
+                profile.picture ?? null,
+              );
+              return {
+                id: userId,
+                name: profile.name ?? profile.email!.split("@")[0],
+                email: profile.email!,
+                avatarUrl: profile.picture ?? null,
+                timezone: "UTC",
+                theme: "system",
+              };
+            },
+          }),
+        ]
+      : []),
+
+    // GitHub OAuth — enabled when GITHUB_CLIENT_ID & SECRET are set
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+      ? [
+          GitHubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            async profile(profile) {
+              const userId = await findOrCreateOAuthUser(
+                profile.email!,
+                profile.name ?? profile.login,
+                profile.avatar_url ?? null,
+              );
+              return {
+                id: userId,
+                name: profile.name ?? profile.login,
+                email: profile.email!,
+                avatarUrl: profile.avatar_url ?? null,
+                timezone: "UTC",
+                theme: "system",
+              };
+            },
+          }),
+        ]
+      : []),
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
