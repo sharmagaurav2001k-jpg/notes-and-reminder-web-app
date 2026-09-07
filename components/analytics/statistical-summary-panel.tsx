@@ -27,7 +27,7 @@ function SkewBadge({ skewness }: { skewness: number }) {
   if (skewness > 0.5) { label = "Right-skewed"; color = "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400"; }
   else if (skewness < -0.5) { label = "Left-skewed"; color = "bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400"; }
   else if (abs > 0.2) { label = "Slight skew"; color = "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"; }
-  return <span className={\`px-2 py-0.5 rounded-full text-[10px] font-bold \${color}\`}>{label}</span>;
+  return <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${color}`}>{label}</span>;
 }
 
 export function StatisticalSummaryPanel() {
@@ -41,7 +41,7 @@ export function StatisticalSummaryPanel() {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(\`/api/analytics-learning?view=stats&days=\${d}\`);
+      const res = await fetch(`/api/analytics-learning?view=stats&days=${d}`);
       if (!res.ok) throw new Error((await res.json()).error || "Failed");
       const data = await res.json();
       setStats(data.stats);
@@ -105,7 +105,7 @@ export function StatisticalSummaryPanel() {
         <div className="flex items-center gap-2">
           {[7, 14, 30, 60, 90].map(d => (
             <button key={d} onClick={() => setDays(d)}
-              className={\`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors \${days === d ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"}\`}>
+              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors ${days === d ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"}`}>
               {d}d
             </button>
           ))}
@@ -116,7 +116,7 @@ export function StatisticalSummaryPanel() {
       <div className="flex flex-wrap gap-2 mb-5">
         {stats.map(s => (
           <button key={s.field} onClick={() => setSelected(s.field)}
-            className={\`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors \${selected === s.field ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"}\`}>
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${selected === s.field ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"}`}>
             {s.field}
           </button>
         ))}

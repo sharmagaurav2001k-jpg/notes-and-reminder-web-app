@@ -7,7 +7,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 
 export type RealtimeEvent = "INSERT" | "UPDATE" | "DELETE" | "*";
 
-export interface RealtimePayload<T = Record<string, unknown>> {
+export interface RealtimePayload<T = Record<string, any>> {
   eventType: RealtimeEvent;
   new: T;
   old: T;
@@ -36,7 +36,7 @@ const activeChannels = new Map<string, RealtimeChannel>();
  * }, []);
  * ```
  */
-export function subscribeToTable<T = Record<string, unknown>>(
+export function subscribeToTable<T extends { [key: string]: any } = Record<string, any>>(
   table: string,
   userId: string,
   callback: (payload: RealtimePayload<T>) => void,

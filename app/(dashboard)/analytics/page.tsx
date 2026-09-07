@@ -43,7 +43,7 @@ interface AnalyticsData {
   };
 }
 
-function SkeletonCard({ className = "" }: { className?: string; children?: React.ReactNode }) {
+function SkeletonCard({ className = "", children }: { className?: string; children?: React.ReactNode }) {
   return (
     <div className={`rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm animate-pulse ${className}`}>
       {children || (
@@ -187,7 +187,7 @@ export default function AnalyticsPage() {
         taskScore={todayScore?.taskScore ?? 0}
         goalScore={todayScore?.goalScore ?? 0}
         noteScore={todayScore?.noteScore ?? 0}
-        streakDays={todayScore?.streakDays ?? data?.stats.currentStreak ?? 0}
+        streakDays={todayScore?.streakDays ?? data?.stats?.currentStreak ?? 0}
         weekAverage={weekAverage}
       />
 

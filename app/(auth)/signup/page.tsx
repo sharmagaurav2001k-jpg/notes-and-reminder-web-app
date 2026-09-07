@@ -17,6 +17,7 @@ import {
   AlertCircle,
   ArrowRight,
 } from "lucide-react";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 
 const signupSchema = z
   .object({
@@ -128,6 +129,24 @@ function SignupForm() {
           <div className="flex-1 font-medium">{serverError}</div>
         </div>
       )}
+
+      {/* Google Sign In */}
+      <div className="space-y-4">
+        <GoogleSignInButton
+          callbackUrl="/dashboard"
+          text="Sign up with Google"
+          onError={(err) => setServerError(err)}
+        />
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center">
+          <div className="grow border-t border-slate-200 dark:border-slate-800" />
+          <span className="shrink-0 px-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            Or continue with email
+          </span>
+          <div className="grow border-t border-slate-200 dark:border-slate-800" />
+        </div>
+      </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">

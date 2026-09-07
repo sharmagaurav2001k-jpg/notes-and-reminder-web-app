@@ -986,7 +986,7 @@ export async function getAIInsights(userId: string): Promise<Insight[]> {
 
 /** Combined payload for the analytics page. All queries run in parallel. */
 export async function getDashboardAnalytics(userId: string) {
-  const [todayScore, history, taskTrend, goalVelocity, timeDistribution, heatmap] =
+  const [todayScore, history, taskTrend, goalVelocity, timeDistribution, heatmap, insights] =
     await Promise.all([
       calculateDailyProductivityScore(userId).catch(() => null),
       getProductivityHistory(userId, 30),
@@ -994,6 +994,7 @@ export async function getDashboardAnalytics(userId: string) {
       getGoalVelocity(userId, 30),
       getTimeDistribution(userId, 30),
       getHeatmapData(userId, 16),
+      getAIInsights(userId).catch(() => []),
     ]);
 
   const avgScore30d = history.length
@@ -1007,12 +1008,34 @@ export async function getDashboardAnalytics(userId: string) {
     }
   }
 
+  const tasksCompleted30d = taskTrend.reduce((s, d) => s + (d.completed ?? 0), 0);
+  const tasksCreated30d = taskTrend.reduce((s, d) => s + (d.created ?? 0), 0);
+  const completionRate = tasksCreated30d > 0 ? Math.round((tasksCompleted30d / tasksCreated30d) * 100) : 0;
+  const latestGoal = goalVelocity.length > 0 ? goalVelocity[goalVelocity.length - 1] : null;
+
   return {
+    todayScore: todayScore
+      ? {
+          score: todayScore.score,
+          taskScore: todayScore.taskScore,
+          goalScore: todayScore.goalScore,
+          noteScore: todayScore.noteScore,
+          streakDays: todayScore.streakDays,
+        }
+      : null,
+    stats: {
+      tasksThisMonth: tasksCompleted30d,
+      tasksChangePct: 0,
+      completionRate,
+      currentStreak: todayScore?.streakDays ?? 0,
+      notesThisMonth: todayScore?.notesCreated ?? 0,
+      goalsActive: latestGoal?.goalsActive ?? 0,
+    },
     summary: {
       todayScore: todayScore?.score ?? 0,
       currentStreak: todayScore?.streakDays ?? 0,
       avgScore30d,
-      tasksCompleted30d: taskTrend.reduce((s, d) => s + d.completed, 0),
+      tasksCompleted30d,
       bestDay30d: bestDay,
     },
     history,
@@ -1020,5 +1043,6 @@ export async function getDashboardAnalytics(userId: string) {
     goalVelocity,
     timeDistribution,
     heatmap,
+    insights,
   };
 }

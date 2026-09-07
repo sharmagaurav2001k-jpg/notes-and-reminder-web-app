@@ -80,3 +80,4 @@ Thumbs.db
 
 # AI Agent / IDE cache (optional)
 .gemini/
+.openclaw/

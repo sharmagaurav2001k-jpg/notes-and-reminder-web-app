@@ -93,7 +93,7 @@ export function SqlPlayground() {
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) runQuery();
           }}
-          placeholder="SELECT * FROM "ProductivityScore" LIMIT 10"
+          placeholder='SELECT * FROM "ProductivityScore" LIMIT 10'
           className="w-full h-28 px-4 py-3 rounded-xl bg-slate-950 dark:bg-slate-950 text-emerald-400 font-mono text-sm border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none resize-y placeholder:text-slate-600"
           spellCheck={false}
         />

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { subscribeToTable, unsubscribeAll, RealtimePayload } from "@/lib/supabase/realtime";
+import { subscribeToTable, unsubscribeAll, RealtimePayload, RealtimeEvent } from "@/lib/supabase/realtime";
 
 /**
  * React hook to subscribe to realtime changes on a Supabase table.
@@ -18,7 +18,7 @@ import { subscribeToTable, unsubscribeAll, RealtimePayload } from "@/lib/supabas
  * }, [payload]);
  * ```
  */
-export function useRealtime<T = Record<string, unknown>>(
+export function useRealtime<T extends { [key: string]: any } = Record<string, any>>(
   table: string,
   userId: string,
   options?: {

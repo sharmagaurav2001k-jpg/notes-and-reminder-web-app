@@ -9,6 +9,8 @@ import * as z from "zod";
 import { signIn } from "next-auth/react";
 import { Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
+
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required").min(6, "Password must be at least 6 characters"),
@@ -16,15 +18,34 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+function getOAuthErrorMessage(errorCode: string | null): string | null {
+  if (!errorCode) return null;
+  switch (errorCode) {
+    case "Configuration":
+      return "Google sign-in is not configured yet. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in your .env file.";
+    case "AccessDenied":
+      return "Google sign-in was cancelled or access was denied.";
+    case "OAuthSignin":
+    case "OAuthCallback":
+    case "OAuthCreateAccount":
+      return "An error occurred during Google sign-in. Please try again.";
+    default:
+      return "Authentication error. Please try again.";
+  }
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const urlMessage = searchParams.get("message");
+  const oauthError = getOAuthErrorMessage(searchParams.get("error"));
 
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const displayedError = serverError || oauthError;
 
   const {
     register,
@@ -77,19 +98,37 @@ function LoginForm() {
       </div>
 
       {/* URL Info Message Banner */}
-      {urlMessage && !serverError && (
+      {urlMessage && !displayedError && (
         <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-sm font-medium animate-in fade-in duration-200">
           {urlMessage}
         </div>
       )}
 
-      {/* Server Error Alert Banner */}
-      {serverError && (
+      {/* Server / OAuth Error Alert Banner */}
+      {displayedError && (
         <div className="flex items-start gap-3 p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 text-sm animate-in fade-in slide-in-from-top-1 duration-200">
           <AlertCircle className="w-5 h-5 shrink-0 text-red-500 mt-0.5" />
-          <div className="flex-1 font-medium">{serverError}</div>
+          <div className="flex-1 font-medium">{displayedError}</div>
         </div>
       )}
+
+      {/* Google Sign In */}
+      <div className="space-y-4">
+        <GoogleSignInButton
+          callbackUrl={callbackUrl}
+          text="Continue with Google"
+          onError={(err) => setServerError(err)}
+        />
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center">
+          <div className="grow border-t border-slate-200 dark:border-slate-800" />
+          <span className="shrink-0 px-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            Or continue with email
+          </span>
+          <div className="grow border-t border-slate-200 dark:border-slate-800" />
+        </div>
+      </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

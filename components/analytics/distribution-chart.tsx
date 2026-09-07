@@ -129,7 +129,7 @@ export function DistributionChart() {
             <Tooltip
               contentStyle={{ borderRadius: "12px", border: "1px solid rgba(148,163,184,0.25)", backgroundColor: "rgba(15,23,42,0.9)", color: "#f8fafc", fontSize: "12px" }}
               labelStyle={{ color: "#94a3b8" }}
-              formatter={(value: number, _name: string, props: any) => [`${value} days (${props.payload.percentage}%)`, "Frequency"]}
+              formatter={(value: any, _name: any, props: any) => [`${value} days (${props?.payload?.percentage}%)`, "Frequency"]}
             />
             <ReferenceLine x={data.q1.toString()} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: "Q1", position: "top", fill: "#f59e0b", fontSize: 10 }} />
             <ReferenceLine x={data.q3.toString()} stroke="#8b5cf6" strokeDasharray="4 4" label={{ value: "Q3", position: "top", fill: "#8b5cf6", fontSize: 10 }} />
