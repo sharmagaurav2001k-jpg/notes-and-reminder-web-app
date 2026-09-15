@@ -565,12 +565,12 @@ export const LEARNING_RESOURCES: LearningResource[] = [
 
 Every SQL query starts with SELECT. You choose which columns you want:
 
-\r\r\rsql
-SELECT score, taskScore, goalScore, date
+\`\`\`sql
+SELECT score, "taskScore", "goalScore", date
 FROM "ProductivityScore"
 ORDER BY date DESC
 LIMIT 10
-\r\r\r
+\`\`\`
 
 ### Key Concepts
 - **SELECT** — choose columns
@@ -581,7 +581,7 @@ LIMIT 10
 
 ### Try It
 Click "Run" on the example query to see your last 10 productivity scores!`,
-    exampleQuery: 'SELECT score, taskScore, goalScore, date FROM "ProductivityScore" ORDER BY date DESC LIMIT 10',
+    exampleQuery: 'SELECT score, "taskScore", "goalScore", date FROM "ProductivityScore" ORDER BY date DESC LIMIT 10',
   },
   {
     id: "sql-aggregates",
@@ -593,15 +593,15 @@ Click "Run" on the example query to see your last 10 productivity scores!`,
 
 Aggregates compute a single value from many rows:
 
-\r\r\rsql
+\`\`\`sql
 SELECT 
   COUNT(*) as total_days,
   ROUND(AVG(score), 1) as avg_score,
   MIN(score) as worst_day,
   MAX(score) as best_day,
-  SUM(tasksCompleted) as total_completed
+  SUM("tasksCompleted") as total_completed
 FROM "ProductivityScore"
-\r\r\r
+\`\`\`
 
 ### Common Aggregates
 | Function | Purpose |
@@ -610,7 +610,7 @@ FROM "ProductivityScore"
 | AVG(col) | Average value |
 | SUM(col) | Total sum |
 | MIN/MAX | Range boundaries |`,
-    exampleQuery: 'SELECT COUNT(*) as total_days, ROUND(AVG(score), 1) as avg_score, MIN(score) as worst_day, MAX(score) as best_day, SUM(tasksCompleted) as total_completed FROM "ProductivityScore"',
+    exampleQuery: 'SELECT COUNT(*) as total_days, ROUND(AVG(score), 1) as avg_score, MIN(score) as worst_day, MAX(score) as best_day, SUM("tasksCompleted") as total_completed FROM "ProductivityScore"',
   },
   {
     id: "sql-group-by",
@@ -622,15 +622,14 @@ FROM "ProductivityScore"
 
 GROUP BY lets you aggregate data by categories:
 
-\r\r\rsql
+\`\`\`sql
 SELECT 
   status,
-  COUNT(*) as task_count,
-  ROUND(AVG(priority), 1) as avg_priority
+  COUNT(*) as task_count
 FROM "Task"
 GROUP BY status
 ORDER BY task_count DESC
-\r\r\r
+\`\`\`
 
 ### Rules
 - Every column in SELECT must be in GROUP BY or wrapped in an aggregate
@@ -648,7 +647,7 @@ ORDER BY task_count DESC
 
 JOINs combine rows from two tables based on a related column:
 
-\r\r\rsql
+\`\`\`sql
 SELECT 
   t.title, t.status, t.priority,
   g.name as goal_name, g.progress as goal_progress
@@ -657,7 +656,7 @@ LEFT JOIN "Goal" g ON t."goalId" = g.id
 WHERE t.status = 'Completed'
 ORDER BY t."completedAt" DESC
 LIMIT 20
-\r\r\r
+\`\`\`
 
 ### Types
 - **INNER JOIN** — only matching rows
