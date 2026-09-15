@@ -11,8 +11,8 @@ interface QueryResult {
 }
 
 const EXAMPLE_QUERIES = [
-  { label: "Last 10 scores", sql: 'SELECT score, taskScore, goalScore, noteScore, date FROM "ProductivityScore" ORDER BY date DESC LIMIT 10' },
-  { label: "Tasks by status", sql: 'SELECT status, COUNT(*) as count, ROUND(AVG(priority), 1) as avg_priority FROM "Task" GROUP BY status ORDER BY count DESC' },
+  { label: "Last 10 scores", sql: 'SELECT score, "taskScore", "goalScore", "noteScore", date FROM "ProductivityScore" ORDER BY date DESC LIMIT 10' },
+  { label: "Tasks by status", sql: 'SELECT status, COUNT(*) as count FROM "Task" GROUP BY status ORDER BY count DESC' },
   { label: "Weekly avg score", sql: 'SELECT EXTRACT(WEEK FROM date) as week_num, ROUND(AVG(score), 1) as avg_score, COUNT(*) as days FROM "ProductivityScore" GROUP BY EXTRACT(WEEK FROM date) ORDER BY week_num DESC LIMIT 12' },
   { label: "Best day of week", sql: 'SELECT EXTRACT(DOW FROM date) as dow, ROUND(AVG(score), 1) as avg_score, COUNT(*) as data_points FROM "ProductivityScore" GROUP BY EXTRACT(DOW FROM date) ORDER BY avg_score DESC' },
   { label: "Goal progress", sql: 'SELECT name, category, status, progress, type FROM "Goal" ORDER BY progress DESC LIMIT 15' },
