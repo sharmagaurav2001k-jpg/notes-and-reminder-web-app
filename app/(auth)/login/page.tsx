@@ -37,7 +37,14 @@ function getOAuthErrorMessage(errorCode: string | null): string | null {
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const rawCallbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  // Only allow safe internal paths. This prevents navigating to malformed or
+  // external URLs (e.g. a broken NEXTAUTH_URL producing `https://"http/...`),
+  // and blocks open-redirect attempts.
+  const callbackUrl =
+    rawCallbackUrl.startsWith("/") && !rawCallbackUrl.startsWith("//")
+      ? rawCallbackUrl
+      : "/dashboard";
   const urlMessage = searchParams.get("message");
   const oauthError = getOAuthErrorMessage(searchParams.get("error"));
 

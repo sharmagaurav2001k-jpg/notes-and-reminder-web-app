@@ -3,15 +3,22 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
-  let token = null;
+  const secret = process.env.NEXTAUTH_SECRET;
 
-  try {
-    token = await getToken({
-      req,
-      secret: process.env.NEXTAUTH_SECRET,
-    });
-  } catch (error) {
-    console.error("Middleware auth check error:", error);
+  // Robust session detection: do NOT depend solely on NEXTAUTH_URL being
+  // perfectly formed. NextAuth derives the session cookie name from it
+  // (`__Secure-next-auth.session-token` when https, else
+  // `next-auth.session-token`), and the cookie name is also used as the
+  // decryption salt. We therefore try both cookie names, so protected
+  // routes keep working even if NEXTAUTH_URL is missing/misconfigured.
+  let token = null;
+  for (const secureCookie of [true, false]) {
+    if (token) break;
+    try {
+      token = await getToken({ req, secret, secureCookie });
+    } catch (error) {
+      console.error("Middleware auth check error:", error);
+    }
   }
 
   const { pathname } = req.nextUrl;
